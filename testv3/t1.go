@@ -3,8 +3,8 @@ package main
 import "fmt"
 
 func main() {
-	urlList := []string{"test", "abc", "def", "ghi"}
-	remove := []string{"abc", "test"}
+	urlList := []string{"testv3", "abc", "def", "ghi"}
+	remove := []string{"abc", "testv3"}
 
 	for i := 0; i < len(urlList); i++ {
 		url := urlList[i]
