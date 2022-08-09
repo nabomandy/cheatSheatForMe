@@ -3,14 +3,19 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/buger/jsonparser"
+	"github.com/djimenez/iconv-go"
 	"github.com/everystreet/go-shapefile"
 	geojson "github.com/paulmach/go.geojson"
-	"os"
+	"golang.org/x/text/encoding/korean"
+	"golang.org/x/text/transform"
 )
 
 func main() {
-	file, err := os.Open("C:\\Users\\USER\\Desktop\\T1\\AL_11110_D198_20220118.zip")
+	//file, err := os.Open("C:\\Users\\USER\\Desktop\\T1\\AL_11110_D198_20220118.zip")
+	file, err := os.Open("C:\\Users\\zeus\\Desktop\\오늘\\용도별건물정보\\AL_11500_D198_20220118.zip")
 	fmt.Println(err)
 	stat, err := file.Stat()
 	fmt.Println(err)
@@ -30,23 +35,27 @@ func main() {
 	// Call Record() to get each record in turn, until either the end of the file, or an error occurs
 	for {
 		record := scanner.Record()
-		if record == nil {
+		if record == nil { // 종료 조건
 			break
 		}
-		//record := scanner.Record()
 		feature := record.GeoJSONFeature()
-		fmt.Println(feature.Geometry)
-		fmt.Println(feature.Properties)
 		testT1, _ := json.Marshal(feature)
 		collection, _ := geojson.UnmarshalFeature(testT1)
-		fmt.Println(collection)
+		p := collection.Properties
+		V1 := fmt.Sprintf("%v", p)
+		fmt.Println(V1)
+		V2 := fmt.Sprintf("%v", p["A6"])
+		fmt.Println(V2)
+		read, _ := iconv.ConvertString(p["A6"].(string), "utf-8", "utf-8")
+		fmt.Println(read)
+
 		polygon := collection.Geometry.Polygon
 		polygonResult := ""
-		for _, multiPolygon := range polygon {
+		for _, multiPolygon := range polygon[0] {
 			polygonResult += fmt.Sprintf(", %v %v", multiPolygon[0], multiPolygon[1])
 			// Each record contains a shape (from .shp file) and attributes (from .dbf file)
-			fmt.Println(record)
 		}
+
 		//for _, feature := range collection.Features {
 		//	fmt.Println(feature.Geometry)
 		//	fmt.Println(feature.Properties)
@@ -80,4 +89,21 @@ func main() {
 
 	// Err() returns the first error encountered during calls to Record()
 	err = scanner.Err()
+}
+
+func UniToAnsi(src []byte) []byte {
+	got, _, _ := transform.String(korean.EUCKR.NewEncoder(), string(src))
+
+	return []byte(got)
+}
+
+func AnsiToUni(src []byte) string {
+	got, _, _ := transform.String(korean.EUCKR.NewDecoder(), string(src))
+
+	return got
+}
+
+func AnsiToUniString(src string) string {
+	got, _, _ := transform.String(korean.EUCKR.NewDecoder(), src)
+	return got
 }
