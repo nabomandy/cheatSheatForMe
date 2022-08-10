@@ -10,7 +10,7 @@ import (
 )
 
 func TestAnsiToUni(t *testing.T) {
-	origin := "��1���ٸ���Ȱ�ü�"
+	origin := "����Ư����ġ��"
 	fmt.Println(origin)
 
 	toUniString := AnsiToUniString(origin)
@@ -19,7 +19,7 @@ func TestAnsiToUni(t *testing.T) {
 	iconvConvert, _ := iconv.ConvertString(origin, "euc-kr", "utf-8")
 	fmt.Println(iconvConvert)
 
-	iconvConvertV2, _ := iconv.ConvertString(origin, "cp949", "utf-8")
+	iconvConvertV2, _ := iconv.ConvertString(origin, "windows-949", "utf-8")
 	fmt.Println(iconvConvertV2)
 
 	iconvConvertV4, _ := iconv.ConvertString(origin, "ISO-8859-1", "utf-8")

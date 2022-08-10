@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/spf13/cast"
 	"os"
+	"reflect"
 
 	"github.com/buger/jsonparser"
 	"github.com/djimenez/iconv-go"
@@ -39,7 +41,31 @@ func main() {
 			break
 		}
 		feature := record.GeoJSONFeature()
+		for idx := 0; idx < len(feature.Properties); idx++ {
+			a := reflect.TypeOf(feature.Properties[idx].Value)
+			if fmt.Sprint(a) == "string" {
+				value := feature.Properties[idx].Value.(string)
+				feature.Properties[idx].Value = ansiToUniString(value)
+			}
+		}
 		testT1, _ := json.Marshal(feature)
+		// "A6" : "�Ϲ�"  // "A6" : "일반"
+		/*	attributes := record.Attributes()
+			fmt.Println(attributes.Field("A6"))*/
+		//iconv.ConvertString(attributes.(string), "utf-8", "euc-kr")
+
+		var feature2 geojson.Feature
+		err3 := json.Unmarshal(testT1, &feature2)
+		fmt.Println(err3)
+		uniString := AnsiToUniStringV2(feature2.Properties["A6"])
+		fmt.Println(uniString)
+
+		charSet := []string{"utf-8", "euc-kr", "ksc5601", "iso-8859-1", "x-windows-949"}
+		for _, i := range charSet {
+			out, _ := iconv.ConvertString(feature2.Properties["A6"].(string), i, "utf-8")
+			fmt.Println(i, " : ", out)
+		}
+
 		collection, _ := geojson.UnmarshalFeature(testT1)
 		p := collection.Properties
 		V1 := fmt.Sprintf("%v", p)
@@ -104,6 +130,16 @@ func AnsiToUni(src []byte) string {
 }
 
 func AnsiToUniString(src string) string {
+	got, _, _ := transform.String(korean.EUCKR.NewDecoder(), src)
+	return got
+}
+
+func AnsiToUniStringV2(src interface{}) string {
+	got, _, _ := transform.String(korean.EUCKR.NewDecoder(), cast.ToString(src))
+	return got
+}
+
+func ansiToUniString(src string) string {
 	got, _, _ := transform.String(korean.EUCKR.NewDecoder(), src)
 	return got
 }
