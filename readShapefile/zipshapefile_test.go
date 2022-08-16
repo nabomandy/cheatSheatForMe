@@ -10,7 +10,11 @@ import (
 )
 
 func TestAnsiToUni(t *testing.T) {
+<<<<<<< HEAD
 	origin := "\ufffd\ufffd\ufffdհ\ufffd\ufffd๰"
+=======
+	origin := "����Ư����ġ��"
+>>>>>>> aaa77687267a054152bc508ce1ea6982bde39f61
 	fmt.Println(origin)
 
 	toUniString := AnsiToUniString(origin)
@@ -19,7 +23,7 @@ func TestAnsiToUni(t *testing.T) {
 	iconvConvert, _ := iconv.ConvertString(origin, "euc-kr", "utf-8")
 	fmt.Println(iconvConvert)
 
-	iconvConvertV2, _ := iconv.ConvertString(origin, "cp949", "utf-8")
+	iconvConvertV2, _ := iconv.ConvertString(origin, "windows-949", "utf-8")
 	fmt.Println(iconvConvertV2)
 
 	iconvConvertV4, _ := iconv.ConvertString(origin, "ISO-8859-1", "utf-8")

@@ -1,8 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 func main() {
+
+	float, err := strconv.ParseFloat("*********", 64)
+	fmt.Println(float)
+	fmt.Println(err)
 
 	ch := make(chan int)
 	//ch <- 2
