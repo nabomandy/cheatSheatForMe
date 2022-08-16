@@ -3,21 +3,20 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/cast"
-	"os"
-	"reflect"
-
 	"github.com/buger/jsonparser"
 	"github.com/djimenez/iconv-go"
 	"github.com/everystreet/go-shapefile"
 	geojson "github.com/paulmach/go.geojson"
+	"github.com/spf13/cast"
 	"golang.org/x/text/encoding/korean"
 	"golang.org/x/text/transform"
+	"os"
 )
 
 func main() {
 	//file, err := os.Open("C:\\Users\\USER\\Desktop\\T1\\AL_11110_D198_20220118.zip")
-	file, err := os.Open("C:\\Users\\zeus\\Desktop\\오늘\\용도별건물정보\\AL_11500_D198_20220118.zip")
+	file, err := os.Open("C:\\juso\\t1_backup")
+	//file, err := os.Open("C:\\Users\\zeus\\Desktop\\오늘\\용도별건물정보\\AL_11500_D198_20220118.zip")
 	fmt.Println(err)
 	stat, err := file.Stat()
 	fmt.Println(err)
@@ -25,7 +24,7 @@ func main() {
 	// Create new ZipScanner
 	// The filename can be replaced with an empty string if you don't want to check filenames inside the zip file
 	//scanner := shapefile.NewZipScanner(file, stat.Size(), "ne_110m_admin_0_sovereignty.zip")
-	scanner, err := shapefile.NewZipScanner(file, stat.Size(), stat.Name())
+	scanner, err := shapefile.NewZipScanner(file, stat.Size(), stat.Name(), shapefile.CharacterDecoder(korean.EUCKR.NewDecoder())) // 디코더 옵션 추가
 
 	// Optionally get file info: shape type, number of records, bounding box, etc.
 	info, err := scanner.Info()
@@ -41,13 +40,7 @@ func main() {
 			break
 		}
 		feature := record.GeoJSONFeature()
-		for idx := 0; idx < len(feature.Properties); idx++ {
-			a := reflect.TypeOf(feature.Properties[idx].Value)
-			if fmt.Sprint(a) == "string" {
-				value := feature.Properties[idx].Value.(string)
-				feature.Properties[idx].Value = ansiToUniString(value)
-			}
-		}
+
 		testT1, _ := json.Marshal(feature)
 		// "A6" : "�Ϲ�"  // "A6" : "일반"
 		/*	attributes := record.Attributes()
@@ -115,6 +108,7 @@ func main() {
 
 	// Err() returns the first error encountered during calls to Record()
 	err = scanner.Err()
+	fmt.Println(err)
 }
 
 func UniToAnsi(src []byte) []byte {

@@ -7,7 +7,7 @@ import (
 
 func main() {
 
-	float, err := strconv.ParseFloat("*********", 64)
+	float, err := strconv.ParseFloat("", 64)
 	fmt.Println(float)
 	fmt.Println(err)
 
