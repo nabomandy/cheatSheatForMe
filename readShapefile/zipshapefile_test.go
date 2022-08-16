@@ -10,7 +10,7 @@ import (
 )
 
 func TestAnsiToUni(t *testing.T) {
-	origin := "��1���ٸ���Ȱ�ü�"
+	origin := "\ufffd\ufffd\ufffdհ\ufffd\ufffd๰"
 	fmt.Println(origin)
 
 	toUniString := AnsiToUniString(origin)

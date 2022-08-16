@@ -6,17 +6,18 @@ import (
 	"os"
 
 	"github.com/buger/jsonparser"
-	"github.com/djimenez/iconv-go"
 	"github.com/everystreet/go-shapefile"
 	geojson "github.com/paulmach/go.geojson"
+	"github.com/spf13/cast"
 	"golang.org/x/text/encoding/korean"
 	"golang.org/x/text/transform"
 )
 
 func main() {
-	//file, err := os.Open("C:\\Users\\USER\\Desktop\\T1\\AL_11110_D198_20220118.zip")
-	file, err := os.Open("C:\\Users\\zeus\\Desktop\\오늘\\용도별건물정보\\AL_11500_D198_20220118.zip")
+	//file, err := os.Open("C:\\Users\\USER\\Desktop\\T1\\NGII_CDM_행정경계(시도).zip")
+	file, err := os.Open("C:\\Users\\USER\\Desktop\\T1\\Z_NGII_N3A_G0010000.zip")
 	fmt.Println(err)
+	//file, _ := os.Open("C:\\Users\\zeus\\Desktop\\����\\�뵵���ǹ�����\\AL_11500_D198_20220118.zip")
 	stat, err := file.Stat()
 	fmt.Println(err)
 
@@ -24,30 +25,50 @@ func main() {
 	// The filename can be replaced with an empty string if you don't want to check filenames inside the zip file
 	//scanner := shapefile.NewZipScanner(file, stat.Size(), "ne_110m_admin_0_sovereignty.zip")
 	scanner, err := shapefile.NewZipScanner(file, stat.Size(), stat.Name())
+	fmt.Println(err)
 
 	// Optionally get file info: shape type, number of records, bounding box, etc.
 	info, err := scanner.Info()
+	fmt.Println(err)
 	fmt.Println(info)
 
 	// Start the scanner
 	err = scanner.Scan()
+	fmt.Println(err)
 
 	// Call Record() to get each record in turn, until either the end of the file, or an error occurs
 	for {
 		record := scanner.Record()
-		if record == nil { // 종료 조건
+		if record == nil { // ���� ����
 			break
 		}
 		feature := record.GeoJSONFeature()
+		p2 := feature.Properties[0]
+		fmt.Println(p2)
+
 		testT1, _ := json.Marshal(feature)
+		fmt.Println(string(testT1))
+
+		var feature2 geojson.Feature
+		err3 := json.Unmarshal(testT1, &feature2)
+		uniString := AnsiToUniStringV2(feature2.Properties["NAME"])
+		fmt.Println(uniString)
+
+		fmt.Println(err3)
+
+		geometryType := feature.Geometry.Type()
+		fmt.Println(geometryType)
+
+		var testT2 map[string]interface{}
+		err2 := json.Unmarshal(testT1, &testT2)
+		fmt.Println(err2)
 		collection, _ := geojson.UnmarshalFeature(testT1)
 		p := collection.Properties
 		V1 := fmt.Sprintf("%v", p)
 		fmt.Println(V1)
 		V2 := fmt.Sprintf("%v", p["A6"])
 		fmt.Println(V2)
-		read, _ := iconv.ConvertString(p["A6"].(string), "utf-8", "utf-8")
-		fmt.Println(read)
+		//read, _ := iconv.ConvertString(p["A6"].(string), "utf-8", "utf-8")
 
 		polygon := collection.Geometry.Polygon
 		polygonResult := ""
@@ -89,6 +110,9 @@ func main() {
 
 	// Err() returns the first error encountered during calls to Record()
 	err = scanner.Err()
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func UniToAnsi(src []byte) []byte {
@@ -105,5 +129,10 @@ func AnsiToUni(src []byte) string {
 
 func AnsiToUniString(src string) string {
 	got, _, _ := transform.String(korean.EUCKR.NewDecoder(), src)
+	return got
+}
+
+func AnsiToUniStringV2(src interface{}) string {
+	got, _, _ := transform.String(korean.EUCKR.NewDecoder(), cast.ToString(src))
 	return got
 }
