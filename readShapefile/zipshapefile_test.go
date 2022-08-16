@@ -10,7 +10,7 @@ import (
 )
 
 func TestAnsiToUni(t *testing.T) {
-	origin := "00******************51"
+	origin := "����Ư����ġ��"
 	fmt.Println(origin)
 
 	toUniString := AnsiToUniString(origin)
