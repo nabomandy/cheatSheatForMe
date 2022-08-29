@@ -14,8 +14,6 @@ func main() {
 
 	a := []string{"1", "2", "3", "4", "5", "6"}
 	fmt.Println(a) // [1 2 3 4 5 6]
-	remove(a, "2")
-	fmt.Println(a) // [1 2 3 4 5 6]
 
 	/////
 	b := []string{"6", "5", "3"}
@@ -28,8 +26,8 @@ func main() {
 
 	fmt.Println(a) // Prints [one three]
 
-	//a = remove(a, "three")
-	//fmt.Println(a) // Prints [one]
+	a = remove(a, "three")
+	fmt.Println(a) // Prints [one]
 }
 
 func remove(s []string, r string) []string {
